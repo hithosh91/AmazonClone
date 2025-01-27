@@ -7,15 +7,21 @@ import { MdOutlineYoutubeSearchedFor } from "react-icons/md";
 import { FaCartShopping } from "react-icons/fa6";
 import { MdMenu } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
-import { logout } from "../Globalstore/Userdetails"; // Import the logout action
+import { logout } from "../Globalstore/Userdetails";
 import { useNavigate } from "react-router-dom";
-const Header: React.FC = () => {
+
+interface HeaderProps {
+  setSearchQuery: (query: string) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ setSearchQuery }) => {
   const dispatch = useDispatch();
   const username = useSelector((state: RootState) => state.user.username);
   const [location, setLocation] = useState({
     city: "Edinburgh",
     postcode: "EH217RN",
   });
+  const [searchInput, setSearchInput] = useState(""); // State for the input field
 
   const navigate = useNavigate();
 
@@ -47,8 +53,13 @@ const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
+    dispatch(logout());
     navigate("/");
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+    setSearchQuery(e.target.value); // Update the search query in parent
   };
 
   return (
@@ -73,7 +84,9 @@ const Header: React.FC = () => {
           <input
             type="text"
             placeholder="Search..."
-            className="w-full p-2 rounded-md border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 text-black rounded-md border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={searchInput} // Bind the value to the state
+            onChange={handleSearchChange} // Update state on input change
           />
           <MdOutlineYoutubeSearchedFor
             size={40}

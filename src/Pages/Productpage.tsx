@@ -10,22 +10,25 @@ const Productpage = () => {
   const products = useSelector((state: RootState) => state.products.products);
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [activeCategory, setActiveCategory] = useState("All Categories");
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
 
   useEffect(() => {
     apihandling();
   }, []);
 
   useEffect(() => {
-    // Filter products based on the active category
-    if (activeCategory === "All Categories") {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(
-        (product) => product.category === activeCategory.toLowerCase()
-      );
-      setFilteredProducts(filtered);
-    }
-  }, [activeCategory, products]);
+    // Filter products based on the active category and search query
+    const filtered = products.filter((product) => {
+      const matchesCategory =
+        activeCategory === "All Categories" ||
+        product.category === activeCategory.toLowerCase();
+      const matchesSearch = product.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+    setFilteredProducts(filtered);
+  }, [activeCategory, products, searchQuery]);
 
   // Handle API
   const apihandling = async () => {
@@ -48,7 +51,7 @@ const Productpage = () => {
 
   return (
     <main>
-      <Header />
+      <Header setSearchQuery={setSearchQuery} />
       <div className="flex w-full min-h-screen bg-gray-100">
         {/* Sidebar */}
         <div className="w-[20%] bg-white shadow-lg rounded-lg p-5 sticky top-0 h-screen">
@@ -103,7 +106,7 @@ const Productpage = () => {
             </div>
           ) : (
             <p className="text-center text-gray-500 text-xl mt-20">
-              No products found in this category.
+              No products found in this category or matching the search query.
             </p>
           )}
         </div>

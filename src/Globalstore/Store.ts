@@ -1,16 +1,16 @@
-// src/Globalstore/Store.ts
+// Globalstore/Store.ts
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./Userdetails";
 import productReducer from "./ProductSlice";
+import userReducer from "./Userdetails";
+import searchReducer from "./Searchslice"; // Import the search slice
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    user: userReducer,
     products: productReducer,
+    user: userReducer,
+    search: searchReducer, // Add search reducer
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-
-export default store;
