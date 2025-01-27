@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts } from "../Globalstore/ProductSlice";
 import { RootState } from "../Globalstore/Store";
+import { Link } from "react-router-dom"; // Import Link for routing
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
 
@@ -98,9 +99,11 @@ const Productpage = () => {
                   <p className="text-xl font-bold text-blue-600 mb-4">
                     ${product.price}
                   </p>
-                  <button className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-                    Add to Cart
-                  </button>
+                  <Link to={`/product/${product.id}`}>
+                    <button className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                      View Details
+                    </button>
+                  </Link>
                 </div>
               ))}
             </div>
