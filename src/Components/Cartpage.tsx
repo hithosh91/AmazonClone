@@ -3,9 +3,20 @@ import { RootState } from "../Globalstore/Store";
 import { Link } from "react-router-dom";
 import { removeItem } from "../Globalstore/Cartslice"; // Import removeItem action
 
+// Define the CartItem type
+interface CartItem {
+  id: number;
+  title: string;
+  price: number;
+  quantity: number;
+  image: string; // Add the image property
+}
+
 const CartPage = () => {
   const dispatch = useDispatch();
-  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const cartItems = useSelector(
+    (state: RootState) => state.cart.items
+  ) as CartItem[];
 
   // Calculate the total price
   const totalPrice = cartItems.reduce(

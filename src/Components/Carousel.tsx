@@ -1,5 +1,5 @@
 // src/Components/Carousel.tsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 const Carousel = () => {
