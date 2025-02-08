@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../Globalstore/Store";
-import { motion } from "framer-motion";
+import { addToCart } from "../Globalstore/Cartslice"; // Import addToCart action
+import { motion } from "framer-motion"; // Framer Motion for animations
 
 interface Product {
   id: number;
@@ -14,9 +15,11 @@ interface Product {
 }
 
 const ProductDetails = () => {
-  const { id } = useParams<{ id: string }>(); // Get the product ID from the URL params
+  const { id } = useParams<{ id: string }>();
   const products = useSelector((state: RootState) => state.products.products);
+  const dispatch = useDispatch();
 
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
@@ -28,71 +31,75 @@ const ProductDetails = () => {
     }
   }, [id, products]);
 
-  if (!product) return <div>Product not found.</div>;
+  const handleAddToCart = () => {
+    if (product) {
+      const cartItem = { ...product, quantity: 1 }; // Create CartItem from Product
+      dispatch(addToCart(cartItem));
+      navigate("/product");
+    }
+  };
+
+  if (!product)
+    return (
+      <div className="text-center py-20 text-xl text-gray-500">
+        Product not found.
+      </div>
+    );
 
   return (
     <motion.div
-      className="container m-5 p-5 rounded-xl shadow-xl"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="max-w-screen-xl mx-auto m-5 p-5 rounded-xl shadow-lg bg-white"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex flex-col lg:flex-row">
-        {/* Product Image with animation */}
-        <motion.img
-          src={product.image}
-          alt={product.title}
-          className="w-full lg:w-1/2 h-96 object-contain mb-4 border-2 border-gray-300 rounded-xl p-2 transition-transform duration-300 hover:scale-105"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Product Image */}
+        <motion.div
+          className="flex justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.img
+            src={product.image}
+            alt={product.title}
+            className="w-full max-w-md h-80 object-contain mb-4 rounded-lg shadow-md"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          />
+        </motion.div>
 
-        <div className="lg:ml-8 flex flex-col justify-between">
-          <motion.h2
-            className="text-2xl font-semibold mb-4"
-            initial={{ x: -100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
+        {/* Product Details */}
+        <motion.div
+          className="flex flex-col justify-between"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          <h2 className="text-3xl font-semibold text-gray-800 mb-4">
             {product.title}
-          </motion.h2>
-
-          <motion.p
-            className="text-xl text-blue-600 mb-4"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
+          </h2>
+          <p className="text-xl font-semibold text-blue-600 mb-4">
             ${product.price}
-          </motion.p>
+          </p>
+          <p className="text-gray-600 mb-6">{product.description}</p>
+          <p className="text-sm text-gray-500 mb-4">
+            Category: {product.category}
+          </p>
 
-          <motion.p
-            className="text-gray-500 mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            {product.description}
-          </motion.p>
-
-          <motion.p
-            className="text-sm text-gray-600 mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4 }}
-          >
-            {product.category}
-          </motion.p>
-
+          {/* Add to Cart Button */}
           <motion.button
-            className="py-2 px-6 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-lg transform hover:scale-105"
-            whileHover={{ scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300 }}
+            onClick={handleAddToCart}
+            className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
           >
             Add to Cart
           </motion.button>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

@@ -12,31 +12,35 @@ const Productpage = () => {
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [activeCategory, setActiveCategory] = useState("All Categories");
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000); // Price range from 0 to 1000
 
   useEffect(() => {
     apihandling();
   }, []);
 
   useEffect(() => {
-    // Filter products based on the active category and search query
+    // Filter products based on category, price range, and search query
     const filtered = products.filter((product) => {
       const matchesCategory =
         activeCategory === "All Categories" ||
-        product.category === activeCategory.toLowerCase();
+        product.category.toLowerCase() === activeCategory.toLowerCase(); // Make sure to match category names
       const matchesSearch = product.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+      const matchesPriceRange =
+        product.price >= minPrice && product.price <= maxPrice;
+      return matchesCategory && matchesSearch && matchesPriceRange;
     });
     setFilteredProducts(filtered);
-  }, [activeCategory, products, searchQuery]);
+  }, [activeCategory, products, searchQuery, minPrice, maxPrice]);
 
-  // Handle API
+  // Handle API fetch
   const apihandling = async () => {
     try {
       const response = await fetch("https://fakestoreapi.com/products");
       const data = await response.json();
-      dispatch(setProducts(data)); // Dispatch the fetched products to the Redux store
+      dispatch(setProducts(data)); // Dispatch the fetched products to Redux store
     } catch (error) {
       console.error("Failed to fetch products:", error);
     }
@@ -74,6 +78,33 @@ const Productpage = () => {
               </li>
             ))}
           </ul>
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-gray-800">Price Range</h3>
+            <div className="flex flex-col items-center mt-4 space-y-2">
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                value={minPrice}
+                onChange={(e) => setMinPrice(Number(e.target.value))}
+                className="w-full"
+              />
+              <input
+                type="range"
+                min="0"
+                max="1000"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full"
+              />
+              <div className="flex justify-between w-full text-sm text-gray-500">
+                <span>0</span>
+                <span>{minPrice}</span>
+                <span>{maxPrice}</span>
+                <span>1000</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Product Grid */}
