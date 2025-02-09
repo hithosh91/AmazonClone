@@ -2,26 +2,26 @@ export const ProductData = [
   {
     id: 1,
     name: "All Categories",
-    image: "/public/allcategory.jpeg",
+    image: "/allcategory.jpeg",
   },
   {
     id: 2,
     name: "Electronics",
-    image: "/public/electronics.jpeg",
+    image: "/electronics.jpeg",
   },
   {
     id: 3,
     name: "Jewels",
-    image: "/public/jewels.jpeg",
+    image: "/jewels.jpeg",
   },
   {
     id: 4,
     name: "Mensclothing",
-    image: "/public/menclothing.jpeg",
+    image: "/menclothing.jpeg",
   },
   {
     id: 5,
     name: "Womenclothing",
-    image: "/public/woman_clothing.jpeg",
+    image: "/woman_clothing.jpeg",
   },
 ];
