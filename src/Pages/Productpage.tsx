@@ -2,29 +2,30 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts } from "../Globalstore/ProductSlice";
 import { RootState } from "../Globalstore/Store";
-import { Link } from "react-router-dom"; // Import Link for routing
+import { Link } from "react-router-dom";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
+import { Menu, X } from "lucide-react"; // Icons for Sidebar Toggle
 
 const Productpage = () => {
   const dispatch = useDispatch();
   const products = useSelector((state: RootState) => state.products.products);
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [activeCategory, setActiveCategory] = useState("All Categories");
-  const [searchQuery, setSearchQuery] = useState(""); // Search query state
+  const [searchQuery, setSearchQuery] = useState("");
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000); // Price range from 0 to 1000
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar State
 
   useEffect(() => {
     apihandling();
   }, []);
 
   useEffect(() => {
-    // Filter products based on category, price range, and search query
     const filtered = products.filter((product) => {
       const matchesCategory =
         activeCategory === "All Categories" ||
-        product.category.toLowerCase() === activeCategory.toLowerCase(); // Make sure to match category names
+        product.category.toLowerCase() === activeCategory.toLowerCase();
       const matchesSearch = product.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
@@ -35,12 +36,11 @@ const Productpage = () => {
     setFilteredProducts(filtered);
   }, [activeCategory, products, searchQuery, minPrice, maxPrice]);
 
-  // Handle API fetch
   const apihandling = async () => {
     try {
       const response = await fetch("https://fakestoreapi.com/products");
       const data = await response.json();
-      dispatch(setProducts(data)); // Dispatch the fetched products to Redux store
+      dispatch(setProducts(data));
     } catch (error) {
       console.error("Failed to fetch products:", error);
     }
@@ -55,11 +55,24 @@ const Productpage = () => {
   ];
 
   return (
-    <main>
+    <main className="min-h-screen bg-gray-100">
       <Header setSearchQuery={setSearchQuery} />
-      <div className="flex w-full min-h-screen bg-gray-100">
+
+      {/* Mobile Sidebar Button */}
+      <button
+        className="md:hidden fixed top-5 left-5 z-50 bg-blue-500 p-2 rounded-full text-white shadow-lg"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      <div className="flex w-full">
         {/* Sidebar */}
-        <div className="w-[20%] bg-white shadow-lg rounded-lg p-5 sticky top-0 h-screen">
+        <div
+          className={`fixed md:relative top-0 left-0 h-full w-[75%] md:w-[25%] lg:w-[20%] bg-white shadow-lg p-5 transition-transform ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0`}
+        >
           <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
             Categories
           </h2>
@@ -67,10 +80,10 @@ const Productpage = () => {
             {categories.map((category, index) => (
               <li
                 key={index}
-                className={`text-sm font-medium px-3 py-2 rounded-md cursor-pointer transition-colors ${
+                className={`text-base font-medium px-3 py-2 rounded-md cursor-pointer transition ${
                   activeCategory === category
                     ? "bg-blue-500 text-white"
-                    : "text-gray-700 hover:text-white hover:bg-blue-500"
+                    : "text-gray-700 hover:bg-blue-500 hover:text-white"
                 }`}
                 onClick={() => setActiveCategory(category)}
               >
@@ -80,7 +93,7 @@ const Productpage = () => {
           </ul>
           <div className="mt-8">
             <h3 className="text-xl font-semibold text-gray-800">Price Range</h3>
-            <div className="flex flex-col items-center mt-4 space-y-2">
+            <div className="flex flex-col mt-4 space-y-2">
               <input
                 type="range"
                 min="0"
@@ -97,7 +110,7 @@ const Productpage = () => {
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="w-full"
               />
-              <div className="flex justify-between w-full text-sm text-gray-500">
+              <div className="flex justify-between text-sm text-gray-500">
                 <span>0</span>
                 <span>{minPrice}</span>
                 <span>{maxPrice}</span>
@@ -108,9 +121,9 @@ const Productpage = () => {
         </div>
 
         {/* Product Grid */}
-        <div className="w-[80%] p-5">
+        <div className="w-full md:w-[75%] lg:w-[80%] p-5">
           {filteredProducts.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
                 <div
                   key={product.id}
@@ -131,7 +144,7 @@ const Productpage = () => {
                     ${product.price}
                   </p>
                   <Link to={`/product/${product.id}`}>
-                    <button className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    <button className="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
                       View Details
                     </button>
                   </Link>
@@ -145,6 +158,7 @@ const Productpage = () => {
           )}
         </div>
       </div>
+
       <Footer />
     </main>
   );
